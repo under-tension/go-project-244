@@ -55,7 +55,9 @@ func main() {
 				return err
 			}
 
-			fmt.Println(firstFileMap, secondFileMap)
+			diff := code.GenDiff(firstFileMap, secondFileMap)
+
+			fmt.Println(diff)
 
 			return nil
 		},
