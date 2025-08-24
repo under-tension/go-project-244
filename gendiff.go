@@ -3,6 +3,7 @@ package code
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"sort"
 )
 
@@ -13,18 +14,29 @@ type diffAst struct {
 }
 
 func ParseFile(path string) (map[string]interface{}, error) {
-	content, err := os.ReadFile(path)
-
+	emptyRes := make(map[string]interface{}, 0)
 	var res map[string]interface{}
 
+	content, err := os.ReadFile(path)
+
 	if err != nil {
-		return res, err
+		return emptyRes, err
 	}
 
-	err = json.Unmarshal(content, &res)
+	fileExt := filepath.Ext(path)
+	fileExt = fileExt[1:]
+
+	fabric := ParserFabric{}
+	parser, err := fabric.getByFileExtension(fileExt)
 
 	if err != nil {
-		return res, err
+		return emptyRes, err
+	}
+
+	res, err = parser.parse(string(content))
+
+	if err != nil {
+		return emptyRes, err
 	}
 
 	return res, nil
