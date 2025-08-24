@@ -21,7 +21,11 @@ func ParseFile(path string) (map[string]interface{}, error) {
 		return res, err
 	}
 
-	json.Unmarshal(content, &res)
+	err = json.Unmarshal(content, &res)
+
+	if err != nil {
+		return res, err
+	}
 
 	return res, nil
 }
