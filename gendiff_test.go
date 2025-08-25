@@ -12,7 +12,8 @@ func TestParseFile(t *testing.T) {
 		filepath string
 		expected map[string]any
 	}{
-		{name: "test default one-level json", filepath: "testdata/fixture/file1.json", expected: map[string]any{"host": "hexlet.io", "timeout": float64(50), "proxy": "123.234.53.22", "follow": false}},
+		{name: "test one-level for json", filepath: "testdata/fixture/file-one-level-v1.json", expected: map[string]any{"host": "hexlet.io", "timeout": float64(50), "proxy": "123.234.53.22", "follow": false}},
+		{name: "test one-level for yaml", filepath: "testdata/fixture/file-one-level-v1.yaml", expected: map[string]any{"host": "hexlet.io", "timeout": 50, "proxy": "123.234.53.22", "follow": false}},
 	}
 
 	for _, test := range table {
