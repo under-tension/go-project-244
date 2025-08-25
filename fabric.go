@@ -16,6 +16,8 @@ func (f ParserFabric) getByFileExtension(ext string) (ParserInterface, error) {
 		return JsonParser{}, nil
 	case "yml":
 		return YmlParser{}, nil
+	case "yaml":
+		return YmlParser{}, nil
 	default:
 		return DummyParser{}, fmt.Errorf("unknow extension %s", ext)
 	}
