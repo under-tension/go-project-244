@@ -17,6 +17,7 @@ func main() {
 			Usage:       "output format",
 			Aliases:     []string{"f"},
 			DefaultText: "stylish",
+			Value:       "stylish",
 		},
 	}
 	cmd := &cli.Command{
@@ -38,6 +39,7 @@ func main() {
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			firstFile := cmd.StringArg("first_file")
 			secondFile := cmd.StringArg("second_file")
+			format := cmd.String("format")
 
 			if firstFile == "" || secondFile == "" {
 				return errors.New("not enough arguments")
@@ -55,7 +57,11 @@ func main() {
 				return err
 			}
 
-			diff := code.GenDiff(firstFileMap, secondFileMap)
+			diff, err := code.GenDiff(firstFileMap, secondFileMap, format)
+
+			if err != nil {
+				return err
+			}
 
 			fmt.Println(diff)
 
