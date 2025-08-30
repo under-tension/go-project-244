@@ -50,7 +50,8 @@ func TestGenDiff(t *testing.T) {
 
 	for _, test := range table {
 		t.Run(test.name, func(t *testing.T) {
-			res := GenDiff(test.first, test.second)
+			res, err := GenDiff(test.first, test.second, "stylish")
+			require.NoError(t, err)
 			require.Equal(t, test.expected, res)
 		})
 	}
