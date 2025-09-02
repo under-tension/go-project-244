@@ -1,17 +1,13 @@
 package code
 
 import (
-	"encoding/json"
+	"code/pkg/fabrics"
+	"code/pkg/formatters"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 )
-
-type diffAst struct {
-	name   string
-	val    interface{}
-	prefix string
-}
 
 func ParseFile(path string) (map[string]interface{}, error) {
 	emptyRes := make(map[string]interface{}, 0)
@@ -26,14 +22,14 @@ func ParseFile(path string) (map[string]interface{}, error) {
 	fileExt := filepath.Ext(path)
 	fileExt = fileExt[1:]
 
-	fabric := ParserFabric{}
-	parser, err := fabric.getByFileExtension(fileExt)
+	fabric := fabrics.ParserFabric{}
+	parser, err := fabric.GetByFileExtension(fileExt)
 
 	if err != nil {
 		return emptyRes, err
 	}
 
-	res, err = parser.parse(string(content))
+	res, err = parser.Parse(string(content))
 
 	if err != nil {
 		return emptyRes, err
@@ -42,8 +38,27 @@ func ParseFile(path string) (map[string]interface{}, error) {
 	return res, nil
 }
 
-func GenDiff(first, second map[string]interface{}) string {
-	diff := []diffAst{}
+func GenDiff(first, second map[string]interface{}, format string) (string, error) {
+	diff := DiffCalc(first, second)
+
+	formatterFabric := fabrics.FormatterFabric{}
+	formatter, err := formatterFabric.GetFormatterByStr(format)
+
+	if err != nil {
+		return "", err
+	}
+
+	result, err := formatter.Format(diff)
+
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
+
+func DiffCalc(first, second map[string]interface{}) []formatters.DiffTree {
+	diff := []formatters.DiffTree{}
 
 	keys := map[string]string{}
 
@@ -59,42 +74,57 @@ func GenDiff(first, second map[string]interface{}) string {
 		val, exist := first[key]
 		val2, exist2 := second[key]
 
+		if isMap(val) && isMap(val2) {
+			node := formatters.DiffTree{}
+			node.Name = key
+			node.Prefix = "  "
+
+			subDiff := []formatters.DiffTree{}
+			subDiff = append(subDiff, DiffCalc(val.(map[string]interface{}), val2.(map[string]interface{}))...)
+
+			node.Val = subDiff
+
+			diff = append(diff, node)
+
+			continue
+		}
+
 		if exist && !exist2 {
-			node := diffAst{}
-			node.name = key
-			node.val = val
-			node.prefix = "- "
+			node := formatters.DiffTree{}
+			node.Name = key
+			node.Val = val
+			node.Prefix = "- "
 
 			diff = append(diff, node)
 			continue
 		} else if !exist && exist2 {
-			node := diffAst{}
-			node.name = key
-			node.val = val2
-			node.prefix = "+ "
+			node := formatters.DiffTree{}
+			node.Name = key
+			node.Val = val2
+			node.Prefix = "+ "
 
 			diff = append(diff, node)
 			continue
 		} else if val != val2 {
-			node := diffAst{}
-			node.name = key
-			node.val = val
-			node.prefix = "- "
+			node := formatters.DiffTree{}
+			node.Name = key
+			node.Val = val
+			node.Prefix = "- "
 
-			node2 := diffAst{}
-			node2.name = key
-			node2.val = val2
-			node2.prefix = "+ "
+			node2 := formatters.DiffTree{}
+			node2.Name = key
+			node2.Val = val2
+			node2.Prefix = "+ "
 
 			diff = append(diff, node)
 			diff = append(diff, node2)
 
 			continue
 		} else {
-			node := diffAst{}
-			node.name = key
-			node.val = val
-			node.prefix = "  "
+			node := formatters.DiffTree{}
+			node.Name = key
+			node.Val = val
+			node.Prefix = "  "
 
 			diff = append(diff, node)
 			continue
@@ -102,20 +132,16 @@ func GenDiff(first, second map[string]interface{}) string {
 	}
 
 	sort.Slice(diff, func(i int, j int) bool {
-		return diff[i].name < diff[j].name
+		return diff[i].Name < diff[j].Name
 	})
 
-	result := ""
-	result += "{\n"
+	return diff
+}
 
-	for _, node := range diff {
-		valEncoded, _ := json.Marshal(node.val)
-
-		result += "	" + node.prefix + node.name + ": " + string(valEncoded) + "\n"
-
+func isMap(v interface{}) bool {
+	if v == nil {
+		return false
 	}
-
-	result += "}\n"
-
-	return string(result)
+	t := reflect.TypeOf(v)
+	return t.Kind() == reflect.Map
 }
