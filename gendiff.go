@@ -77,7 +77,8 @@ func DiffCalc(first, second map[string]interface{}) []formatters.DiffTree {
 		if isMap(val) && isMap(val2) {
 			node := formatters.DiffTree{}
 			node.Name = key
-			node.Prefix = "  "
+			node.Type = formatters.TYPE_ROOT
+			node.Status = formatters.STATUS_NON_CHANGE
 
 			subDiff := []formatters.DiffTree{}
 			subDiff = append(subDiff, DiffCalc(val.(map[string]interface{}), val2.(map[string]interface{}))...)
@@ -92,39 +93,38 @@ func DiffCalc(first, second map[string]interface{}) []formatters.DiffTree {
 		if exist && !exist2 {
 			node := formatters.DiffTree{}
 			node.Name = key
-			node.Val = val
-			node.Prefix = "- "
+			node.Type = formatters.TYPE_FINAL
+			node.OldVal = val
+			node.Status = formatters.STATUS_DELETED
 
 			diff = append(diff, node)
 			continue
 		} else if !exist && exist2 {
 			node := formatters.DiffTree{}
 			node.Name = key
+			node.Type = formatters.TYPE_FINAL
 			node.Val = val2
-			node.Prefix = "+ "
+			node.Status = formatters.STATUS_ADDED
 
 			diff = append(diff, node)
 			continue
 		} else if val != val2 {
 			node := formatters.DiffTree{}
 			node.Name = key
-			node.Val = val
-			node.Prefix = "- "
-
-			node2 := formatters.DiffTree{}
-			node2.Name = key
-			node2.Val = val2
-			node2.Prefix = "+ "
+			node.Type = formatters.TYPE_FINAL
+			node.OldVal = val
+			node.Val = val2
+			node.Status = formatters.STATUS_UPDATED
 
 			diff = append(diff, node)
-			diff = append(diff, node2)
 
 			continue
 		} else {
 			node := formatters.DiffTree{}
 			node.Name = key
+			node.Type = formatters.TYPE_FINAL
 			node.Val = val
-			node.Prefix = "  "
+			node.Status = formatters.STATUS_NON_CHANGE
 
 			diff = append(diff, node)
 			continue
