@@ -1,9 +1,23 @@
 package formatters
 
+const (
+	STATUS_ADDED = iota
+	STATUS_DELETED
+	STATUS_UPDATED
+	STATUS_NON_CHANGE
+)
+
+const (
+	TYPE_ROOT = iota
+	TYPE_FINAL
+)
+
 type DiffTree struct {
 	Name   string
-	Val    interface{}
-	Prefix string
+	Type   int
+	Status int
+	OldVal any
+	Val    any
 }
 
 type FormatterInterface interface {
