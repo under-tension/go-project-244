@@ -8,3 +8,6 @@ test:
 
 lint:
 	golangci-lint run
+
+coverage:
+	go test -coverprofile=coverage.out ./...
