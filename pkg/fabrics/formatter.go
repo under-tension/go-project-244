@@ -17,6 +17,8 @@ func (f FormatterFabric) GetFormatterByStr(key string) (formatters.FormatterInte
 		return formatters.StylishFormatter{}, nil
 	case "plain":
 		return formatters.PlainFormatter{}, nil
+	case "json":
+		return formatters.JsonFormatter{}, nil
 	default:
 		return formatters.DummyFormatter{}, fmt.Errorf("unknow %s formatter", key)
 	}
