@@ -14,7 +14,7 @@ type FormatterFabric struct{}
 func (f FormatterFabric) GetFormatterByStr(key string) (formatters.FormatterInterface, error) {
 	switch key {
 	case "stylish":
-		return formatters.DefaultFormatter{}, nil
+		return formatters.StylishFormatter{}, nil
 	case "plain":
 		return formatters.PlainFormatter{}, nil
 	default:

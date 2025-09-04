@@ -5,16 +5,16 @@ import (
 	"strings"
 )
 
-type DefaultFormatter struct {
+type StylishFormatter struct {
 	BaseFormatter
 }
 
-func (f DefaultFormatter) Format(diffTree []DiffTree) (string, error) {
+func (f StylishFormatter) Format(diffTree []DiffTree) (string, error) {
 	f.settings = Settings{StartIdents: 0}
 	return f.format(diffTree, f.settings.StartIdents)
 }
 
-func (f DefaultFormatter) format(diff []DiffTree, depth int) (string, error) {
+func (f StylishFormatter) format(diff []DiffTree, depth int) (string, error) {
 	result := ""
 	result += "{\n"
 
