@@ -1,7 +1,8 @@
 package formatters
 
 import (
-	"encoding/json"
+	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -27,30 +28,70 @@ func (f StylishFormatter) format(diff []DiffTree, depth int) (string, error) {
 				return "", err
 			}
 
-			result += strings.Repeat("\t", depth+1) + node.Name + ": " + subTreeResult
+			result += strings.Repeat("    ", depth+1) + node.Name + ": " + subTreeResult
 		} else {
-			oldValEncoded, _ := json.Marshal(node.OldVal)
-			valEncoded, _ := json.Marshal(node.Val)
+			oldValEncoded := renderValue(node.OldVal, depth)
+			valEncoded := renderValue(node.Val, depth)
 
-			result += strings.Repeat("\t", depth+1)
+			space := strings.Repeat(" ", ((depth+1)*4)-2)
+			result += space
 
 			switch node.Status {
 			case STATUS_ADDED:
-				result += "+ " + node.Name + ": " + string(valEncoded) + "\n"
+				result += "+ " + node.Name + ": " + valEncoded
 			case STATUS_DELETED:
-				result += "- " + node.Name + ": " + string(oldValEncoded) + "\n"
+				result += "- " + node.Name + ": " + oldValEncoded
 			case STATUS_NON_CHANGE:
-				result += "  " + node.Name + ": " + string(valEncoded) + "\n"
+				result += "  " + node.Name + ": " + valEncoded
 			case STATUS_UPDATED:
-				result += "- " + node.Name + ": " + string(oldValEncoded) + "\n"
-				result += strings.Repeat("\t", depth+1)
-				result += "+ " + node.Name + ": " + string(valEncoded) + "\n"
+				result += "- " + node.Name + ": " + oldValEncoded
+				result += space
+				result += "+ " + node.Name + ": " + valEncoded
 			}
 		}
 
 	}
 
-	result += strings.Repeat("\t", depth) + "}\n"
+	result += strings.Repeat("    ", depth) + "}"
+
+	if depth > 0 {
+		result += "\n"
+	}
 
 	return result, nil
+}
+
+func renderValue(val any, depth int) string {
+	switch val := val.(type) {
+	case map[string]any:
+		return renderMap(val, depth+1)
+	case nil:
+		return "null\n"
+	default:
+		return fmt.Sprintf("%v\n", val)
+	}
+}
+
+func renderMap(val map[string]any, depth int) string {
+	keys := make([]string, 0)
+
+	for key := range val {
+		keys = append(keys, key)
+	}
+
+	sort.Slice(keys, func(i int, j int) bool {
+		return i < j
+	})
+
+	result := ""
+	result += "{\n"
+
+	for _, key := range keys {
+		value := val[key]
+		result += strings.Repeat("    ", depth+1) + fmt.Sprintf("%s: %s", key, renderValue(value, depth))
+	}
+
+	result += strings.Repeat("    ", depth) + "}\n"
+
+	return result
 }
