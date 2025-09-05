@@ -45,19 +45,7 @@ func main() {
 				return errors.New("not enough arguments")
 			}
 
-			firstFileMap, err := code.ParseFile(firstFile)
-
-			if err != nil {
-				return err
-			}
-
-			secondFileMap, err := code.ParseFile(secondFile)
-
-			if err != nil {
-				return err
-			}
-
-			diff, err := code.GenDiff(firstFileMap, secondFileMap, format)
+			diff, err := code.GenDiff(firstFile, secondFile, format)
 
 			if err != nil {
 				return err

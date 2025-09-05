@@ -2,6 +2,7 @@ package formatters
 
 import (
 	"fmt"
+	"strings"
 )
 
 type PlainFormatter struct {
@@ -13,7 +14,7 @@ func (f PlainFormatter) Format(diffTree []DiffTree) (string, error) {
 }
 
 func (f PlainFormatter) format(diff []DiffTree, path string) (string, error) {
-	result := ""
+	var lines []string
 
 	for _, node := range diff {
 
@@ -25,25 +26,32 @@ func (f PlainFormatter) format(diff []DiffTree, path string) (string, error) {
 				return "", err
 			}
 
-			result += subTreeResult
+			if subTreeResult != "" {
+				lines = append(lines, subTreeResult)
+			}
 		} else {
 			oldVal, _ := f.prepareValue(node.OldVal)
 			val, _ := f.prepareValue(node.Val)
 
 			currentPath := path + node.Name
 
+			var line string
 			switch node.Status {
 			case STATUS_ADDED:
-				result += fmt.Sprintf("Property '%s' was added with value: %s\n", currentPath, val)
+				line = fmt.Sprintf("Property '%s' was added with value: %s", currentPath, val)
 			case STATUS_DELETED:
-				result += fmt.Sprintf("Property '%s' was removed\n", currentPath)
+				line = fmt.Sprintf("Property '%s' was removed", currentPath)
 			case STATUS_UPDATED:
-				result += fmt.Sprintf("Property '%s' was updated. From %s to %s\n", currentPath, oldVal, val)
+				line = fmt.Sprintf("Property '%s' was updated. From %s to %s", currentPath, oldVal, val)
+			}
+
+			if line != "" {
+				lines = append(lines, line)
 			}
 		}
 	}
 
-	return result, nil
+	return strings.Join(lines, "\n"), nil
 }
 
 func (f PlainFormatter) prepareValue(val any) (string, error) {
@@ -55,7 +63,7 @@ func (f PlainFormatter) prepareValue(val any) (string, error) {
 	case nil:
 		result = "null"
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64,
-		float32, float64, complex64, complex128:
+		float32, float64, complex64, complex128, bool:
 		result = fmt.Sprintf("%v", val)
 	default:
 		result = "[complex value]"

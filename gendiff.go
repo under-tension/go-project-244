@@ -38,8 +38,20 @@ func ParseFile(path string) (map[string]interface{}, error) {
 	return res, nil
 }
 
-func GenDiff(first, second map[string]interface{}, format string) (string, error) {
-	diff := DiffCalc(first, second)
+func GenDiff(firstFile, secondFile string, format string) (string, error) {
+	firstFileMap, err := ParseFile(firstFile)
+
+	if err != nil {
+		return "", err
+	}
+
+	secondFileMap, err := ParseFile(secondFile)
+
+	if err != nil {
+		return "", err
+	}
+
+	diff := DiffCalc(firstFileMap, secondFileMap)
 
 	formatterFabric := fabrics.FormatterFabric{}
 	formatter, err := formatterFabric.GetFormatterByStr(format)

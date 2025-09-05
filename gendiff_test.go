@@ -28,23 +28,22 @@ func TestParseFile(t *testing.T) {
 func TestGenDiff(t *testing.T) {
 	table := []struct {
 		name     string
-		first    map[string]any
-		second   map[string]any
+		first    string
+		second   string
 		expected string
 	}{
 		{
 			name:   "test one-level",
-			first:  map[string]any{"host": "hexlet.io", "timeout": float64(50), "proxy": "123.234.53.22", "follow": false},
-			second: map[string]any{"timeout": float64(20), "verbose": true, "host": "hexlet.io"},
+			first:  "testdata/fixture/file-one-level-v1.json",
+			second: "testdata/fixture/file-one-level-v2.json",
 			expected: `{
-	- follow: false
-	  host: "hexlet.io"
-	- proxy: "123.234.53.22"
-	- timeout: 50
-	+ timeout: 20
-	+ verbose: true
-}
-`,
+  - follow: false
+    host: hexlet.io
+  - proxy: 123.234.53.22
+  - timeout: 50
+  + timeout: 20
+  + verbose: true
+}`,
 		},
 	}
 
