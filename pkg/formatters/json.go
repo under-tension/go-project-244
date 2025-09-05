@@ -2,6 +2,7 @@ package formatters
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 )
 
@@ -15,8 +16,7 @@ func (f JsonFormatter) Format(diffTree []DiffTree) (string, error) {
 }
 
 func (f JsonFormatter) format(diff []DiffTree, depth int) (string, error) {
-	result := ""
-	result += "{\n"
+	var lines []string
 
 	for _, node := range diff {
 
@@ -27,29 +27,27 @@ func (f JsonFormatter) format(diff []DiffTree, depth int) (string, error) {
 				return "", err
 			}
 
-			result += strings.Repeat("\t", depth+1) + node.Name + ": " + subTreeResult
+			line := fmt.Sprintf("\"%s\": %s", node.Name, subTreeResult)
+			lines = append(lines, line)
 		} else {
 			oldValEncoded, _ := json.Marshal(node.OldVal)
 			valEncoded, _ := json.Marshal(node.Val)
 
-			result += strings.Repeat("\t", depth+1)
-
 			switch node.Status {
 			case STATUS_ADDED:
-				result += "+ " + node.Name + ": " + string(valEncoded) + "\n"
+				lines = append(lines, fmt.Sprintf("\"+ %s\": %s", node.Name, string(valEncoded)))
 			case STATUS_DELETED:
-				result += "- " + node.Name + ": " + string(oldValEncoded) + "\n"
+				lines = append(lines, fmt.Sprintf("\"- %s\": %s", node.Name, string(oldValEncoded)))
 			case STATUS_NON_CHANGE:
-				result += "  " + node.Name + ": " + string(valEncoded) + "\n"
+				lines = append(lines, fmt.Sprintf("\"  %s\": %s", node.Name, string(valEncoded)))
 			case STATUS_UPDATED:
-				result += "- " + node.Name + ": " + string(oldValEncoded) + "\n"
-				result += strings.Repeat("\t", depth+1)
-				result += "+ " + node.Name + ": " + string(valEncoded) + "\n"
+				lines = append(lines, fmt.Sprintf("\"- %s\": %s", node.Name, string(oldValEncoded)))
+				lines = append(lines, fmt.Sprintf("\"+ %s\": %s", node.Name, string(valEncoded)))
 			}
 		}
 	}
 
-	result += strings.Repeat("\t", depth) + "}\n"
+	result := fmt.Sprintf("{\n%s\n}", strings.Join(lines, ",\n"))
 
 	return result, nil
 }
