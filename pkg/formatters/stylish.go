@@ -16,8 +16,7 @@ func (f StylishFormatter) Format(diffTree []DiffTree) (string, error) {
 }
 
 func (f StylishFormatter) format(diff []DiffTree, depth int) (string, error) {
-	result := ""
-	result += "{\n"
+	var lines []string
 
 	for _, node := range diff {
 
@@ -28,35 +27,32 @@ func (f StylishFormatter) format(diff []DiffTree, depth int) (string, error) {
 				return "", err
 			}
 
-			result += strings.Repeat("    ", depth+1) + node.Name + ": " + subTreeResult
+			line := strings.Repeat("    ", depth+1) + node.Name + ": " + subTreeResult
+			lines = append(lines, line)
 		} else {
 			oldValEncoded := renderValue(node.OldVal, depth)
 			valEncoded := renderValue(node.Val, depth)
 
 			space := strings.Repeat(" ", ((depth+1)*4)-2)
-			result += space
 
 			switch node.Status {
 			case STATUS_ADDED:
-				result += "+ " + node.Name + ": " + valEncoded
+				lines = append(lines, space+fmt.Sprintf("+ %s: %s", node.Name, valEncoded))
 			case STATUS_DELETED:
-				result += "- " + node.Name + ": " + oldValEncoded
+				lines = append(lines, space+fmt.Sprintf("- %s: %s", node.Name, oldValEncoded))
 			case STATUS_NON_CHANGE:
-				result += "  " + node.Name + ": " + valEncoded
+				lines = append(lines, space+fmt.Sprintf("  %s: %s", node.Name, valEncoded))
 			case STATUS_UPDATED:
-				result += "- " + node.Name + ": " + oldValEncoded
-				result += space
-				result += "+ " + node.Name + ": " + valEncoded
+				lines = append(lines, space+fmt.Sprintf("- %s: %s", node.Name, oldValEncoded))
+				lines = append(lines, space+fmt.Sprintf("+ %s: %s", node.Name, valEncoded))
 			}
 		}
 
 	}
 
-	result += strings.Repeat("    ", depth) + "}"
+	end := strings.Repeat("    ", depth) + "}"
 
-	if depth > 0 {
-		result += "\n"
-	}
+	result := fmt.Sprintf("{\n%s\n%s", strings.Join(lines, "\n"), end)
 
 	return result, nil
 }
@@ -66,9 +62,9 @@ func renderValue(val any, depth int) string {
 	case map[string]any:
 		return renderMap(val, depth+1)
 	case nil:
-		return "null\n"
+		return "null"
 	default:
-		return fmt.Sprintf("%v\n", val)
+		return fmt.Sprintf("%v", val)
 	}
 }
 
@@ -80,18 +76,20 @@ func renderMap(val map[string]any, depth int) string {
 	}
 
 	sort.Slice(keys, func(i int, j int) bool {
-		return i < j
+		return keys[i] < keys[j]
 	})
 
-	result := ""
-	result += "{\n"
+	var lines []string
 
 	for _, key := range keys {
 		value := val[key]
-		result += strings.Repeat("    ", depth+1) + fmt.Sprintf("%s: %s", key, renderValue(value, depth))
+		line := strings.Repeat("    ", depth+1) + fmt.Sprintf("%s: %s", key, renderValue(value, depth))
+		lines = append(lines, line)
 	}
 
-	result += strings.Repeat("    ", depth) + "}\n"
+	end := strings.Repeat("    ", depth) + "}"
+
+	result := fmt.Sprintf("{\n%s\n%s", strings.Join(lines, "\n"), end)
 
 	return result
 }

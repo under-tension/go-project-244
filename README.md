@@ -6,7 +6,7 @@
 
 ## Requirements
 
-- PHP 1.24 or higher.
+- Go 1.24 or higher.
 
 ## 🚀 Get started
 
