@@ -51,7 +51,7 @@ func GenDiff(firstFile, secondFile string, format string) (string, error) {
 		return "", err
 	}
 
-	diff := DiffCalc(firstFileMap, secondFileMap)
+	diff := diffCalc(firstFileMap, secondFileMap)
 
 	formatterFabric := fabrics.FormatterFabric{}
 	formatter, err := formatterFabric.GetFormatterByStr(format)
@@ -69,7 +69,7 @@ func GenDiff(firstFile, secondFile string, format string) (string, error) {
 	return result, nil
 }
 
-func DiffCalc(first, second map[string]interface{}) []formatters.DiffTree {
+func diffCalc(first, second map[string]interface{}) []formatters.DiffTree {
 	diff := []formatters.DiffTree{}
 
 	keys := map[string]string{}
@@ -93,7 +93,7 @@ func DiffCalc(first, second map[string]interface{}) []formatters.DiffTree {
 			node.Status = formatters.STATUS_NON_CHANGE
 
 			subDiff := []formatters.DiffTree{}
-			subDiff = append(subDiff, DiffCalc(val.(map[string]interface{}), val2.(map[string]interface{}))...)
+			subDiff = append(subDiff, diffCalc(val.(map[string]interface{}), val2.(map[string]interface{}))...)
 
 			node.Val = subDiff
 
