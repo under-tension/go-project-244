@@ -22,7 +22,7 @@ func main() {
 	}
 	cmd := &cli.Command{
 		Name:  "gendiff",
-		Usage: "Compares two configuration files and shows a difference.",
+		Usage: "Compares two configuration files and shows a difference. Supports yaml and json formats.",
 		Flags: flags,
 		Arguments: []cli.Argument{
 			&cli.StringArg{
