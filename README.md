@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/under-tension/go-project-244/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/under-tension/go-project-244/actions) [![on-push](https://github.com/under-tension/go-project-244/actions/workflows/on-push.yml/badge.svg)](https://github.com/under-tension/go-project-244/actions/workflows/on-push.yml) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=under-tension_go-project-244&metric=coverage)](https://sonarcloud.io/summary/new_code?id=under-tension_go-project-244)
+[![Actions Status](https://github.com/under-tension/go-project-244/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/under-tension/go-project-244/actions) [![linter](https://github.com/under-tension/go-project-244/actions/workflows/linter.yml/badge.svg)](https://github.com/under-tension/go-project-244/actions/workflows/linter.yml) [![Test and build](https://github.com/under-tension/go-project-244/actions/workflows/test-and-build.yml/badge.svg)](https://github.com/under-tension/go-project-244/actions/workflows/test-and-build.yml) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=under-tension_go-project-244&metric=coverage)](https://sonarcloud.io/summary/new_code?id=under-tension_go-project-244)
 
 [![GO](https://img.shields.io/badge/go-1.24+-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)](https://go.dev)
 
@@ -10,7 +10,7 @@
 
 ## 🚀 Get started
 
-1. Coning
+1. Cloning
 ```
 git clone https://github.com/under-tension/go-project-242.git gendiff
 cd ./gendiff
