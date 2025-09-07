@@ -26,7 +26,7 @@ make build
 ./bin/gendiff <file_1> <file_2>
 ```
 
-<img src="./docs/assets/gif/demo-install.gif" alt="Video instruction" width="600" />
+<img src="./docs/assets/gif/demo-install.gif" alt="Video instruction" width="800" />
 
 ### Flags
 
