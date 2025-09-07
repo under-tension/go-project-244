@@ -2,7 +2,7 @@
 
 [![GO](https://img.shields.io/badge/go-1.24+-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)](https://go.dev)
 
-> **gendiff** - Compares two files and shows a difference. Supports yaml and json formats.
+> **gendiff** - Compares two files and shows a difference. Supports **yaml** and **json** formats.
 
 ## Requirements
 
@@ -12,7 +12,7 @@
 
 1. Cloning
 ```
-git clone https://github.com/under-tension/go-project-242.git gendiff
+git clone https://github.com/under-tension/go-project-244.git gendiff
 cd ./gendiff
 ```
 
@@ -25,6 +25,8 @@ make build
 ```
 ./bin/gendiff <file_1> <file_2>
 ```
+
+<img src="./docs/assets/gif/demo-install.gif" alt="Video instruction" width="600" />
 
 ### Flags
 
