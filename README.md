@@ -58,6 +58,8 @@ make build
 RetroGame/
 ├── bin/                    # Binaries
 ├── cmd/                    # Console applications
+├── docs/                   # Pages and assets for documentation
+│   ├── assets/             # Assets for documentation
 ├── pkg/                    # Externally accessible packages
 │   ├── fabrics/            # Factories for different packages
 │   ├── formatters/         # Formatters for different output styles
