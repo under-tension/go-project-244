@@ -27,6 +27,44 @@ func TestParseFile(t *testing.T) {
 	}
 }
 
+func TestParseFile_InalidInput(t *testing.T) {
+	table := []struct {
+		name     string
+		filepath string
+		expected map[string]any
+	}{
+		{
+			name:     "not exist file",
+			filepath: "not_exist.json",
+			expected: map[string]any{},
+		},
+		{
+			name:     "invalid extension",
+			filepath: "testdata/fixture/gendiff/input/empty.xml",
+			expected: map[string]any{},
+		},
+		{
+			name:     "invalid json content",
+			filepath: "testdata/fixture/gendiff/input/invalid.json",
+			expected: map[string]any{},
+		},
+		{
+			name:     "invalid yaml content",
+			filepath: "testdata/fixture/gendiff/input/invalid.yaml",
+			expected: map[string]any{},
+		},
+	}
+
+	for _, test := range table {
+		t.Run(test.name, func(t *testing.T) {
+			res, err := ParseFile(test.filepath)
+			require.Error(t, err)
+			require.Equal(t, test.expected, res)
+		})
+	}
+
+}
+
 func TestGenDiff(t *testing.T) {
 	stylishExpected, _ := os.ReadFile("testdata/fixture/gendiff/expected/multi-level-stylish.txt")
 	plainExpected, _ := os.ReadFile("testdata/fixture/gendiff/expected/multi-level-plain.txt")
