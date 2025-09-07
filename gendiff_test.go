@@ -130,6 +130,46 @@ func TestGenDiff(t *testing.T) {
 	}
 }
 
+func TestGenDiff_InalidInput(t *testing.T) {
+	table := []struct {
+		name     string
+		format   string
+		first    string
+		second   string
+		expected string
+	}{
+		{
+			name:     "first file not exist",
+			first:    "not_exist.json",
+			format:   "stylish",
+			second:   "testdata/fixture/gendiff/input/multi-levelv2.json",
+			expected: "",
+		},
+		{
+			name:     "second file not exist",
+			format:   "stylish",
+			first:    "testdata/fixture/gendiff/input/multi-levelv2.json",
+			second:   "not_exist.json",
+			expected: "",
+		},
+		{
+			name:     "invalid format",
+			format:   "not-found",
+			first:    "testdata/fixture/gendiff/input/multi-levelv1.json",
+			second:   "testdata/fixture/gendiff/input/multi-levelv2.json",
+			expected: "",
+		},
+	}
+
+	for _, test := range table {
+		t.Run(test.name, func(t *testing.T) {
+			res, err := GenDiff(test.first, test.second, test.format)
+			require.Error(t, err)
+			require.Equal(t, test.expected, res)
+		})
+	}
+}
+
 func TestIsMap(t *testing.T) {
 	table := []struct {
 		name     string
