@@ -13,7 +13,7 @@ func ParseFile(path string) (map[string]interface{}, error) {
 	emptyRes := make(map[string]interface{}, 0)
 	var res map[string]interface{}
 
-	content, err := os.ReadFile(path)
+	content, err := os.ReadFile(filepath.Clean(path))
 
 	if err != nil {
 		return emptyRes, err
@@ -83,64 +83,8 @@ func diffCalc(first, second map[string]interface{}) []formatters.DiffTree {
 	}
 
 	for key := range keys {
-		val, exist := first[key]
-		val2, exist2 := second[key]
-
-		if isMap(val) && isMap(val2) {
-			node := formatters.DiffTree{}
-			node.Name = key
-			node.Type = formatters.TYPE_ROOT
-			node.Status = formatters.STATUS_NON_CHANGE
-
-			subDiff := []formatters.DiffTree{}
-			subDiff = append(subDiff, diffCalc(val.(map[string]interface{}), val2.(map[string]interface{}))...)
-
-			node.Val = subDiff
-
-			diff = append(diff, node)
-
-			continue
-		}
-
-		if exist && !exist2 {
-			node := formatters.DiffTree{}
-			node.Name = key
-			node.Type = formatters.TYPE_FINAL
-			node.OldVal = val
-			node.Status = formatters.STATUS_DELETED
-
-			diff = append(diff, node)
-			continue
-		} else if !exist && exist2 {
-			node := formatters.DiffTree{}
-			node.Name = key
-			node.Type = formatters.TYPE_FINAL
-			node.Val = val2
-			node.Status = formatters.STATUS_ADDED
-
-			diff = append(diff, node)
-			continue
-		} else if val != val2 {
-			node := formatters.DiffTree{}
-			node.Name = key
-			node.Type = formatters.TYPE_FINAL
-			node.OldVal = val
-			node.Val = val2
-			node.Status = formatters.STATUS_UPDATED
-
-			diff = append(diff, node)
-
-			continue
-		} else {
-			node := formatters.DiffTree{}
-			node.Name = key
-			node.Type = formatters.TYPE_FINAL
-			node.Val = val
-			node.Status = formatters.STATUS_NON_CHANGE
-
-			diff = append(diff, node)
-			continue
-		}
+		node := processDiff(key, first, second)
+		diff = append(diff, node)
 	}
 
 	sort.Slice(diff, func(i int, j int) bool {
@@ -148,6 +92,43 @@ func diffCalc(first, second map[string]interface{}) []formatters.DiffTree {
 	})
 
 	return diff
+}
+
+func processDiff(key string, first, second map[string]interface{}) formatters.DiffTree {
+	val, exist := first[key]
+	val2, exist2 := second[key]
+
+	var node formatters.DiffTree
+	node.Name = key
+
+	if isMap(val) && isMap(val2) {
+		node.Type = formatters.TYPE_ROOT
+		node.Status = formatters.STATUS_NON_CHANGE
+		subDiff := diffCalc(val.(map[string]interface{}), val2.(map[string]interface{}))
+		node.Val = subDiff
+		return node
+	}
+
+	if !exist {
+		node.Type = formatters.TYPE_FINAL
+		node.Val = val2
+		node.Status = formatters.STATUS_ADDED
+	} else if !exist2 {
+		node.Type = formatters.TYPE_FINAL
+		node.OldVal = val
+		node.Status = formatters.STATUS_DELETED
+	} else if val != val2 {
+		node.Type = formatters.TYPE_FINAL
+		node.OldVal = val
+		node.Val = val2
+		node.Status = formatters.STATUS_UPDATED
+	} else {
+		node.Type = formatters.TYPE_FINAL
+		node.Val = val
+		node.Status = formatters.STATUS_NON_CHANGE
+	}
+
+	return node
 }
 
 func isMap(v interface{}) bool {

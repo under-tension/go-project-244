@@ -20,6 +20,6 @@ func (f ParserFabric) GetByFileExtension(ext string) (parsers.ParserInterface, e
 	case "yaml":
 		return parsers.YmlParser{}, nil
 	default:
-		return parsers.DummyParser{}, fmt.Errorf("unknow extension %s", ext)
+		return parsers.DummyParser{}, fmt.Errorf("unknown extension %s", ext)
 	}
 }
