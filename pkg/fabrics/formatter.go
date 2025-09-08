@@ -20,6 +20,6 @@ func (f FormatterFabric) GetFormatterByStr(key string) (formatters.FormatterInte
 	case "json":
 		return formatters.JsonFormatter{}, nil
 	default:
-		return formatters.DummyFormatter{}, fmt.Errorf("unknow %s formatter", key)
+		return formatters.DummyFormatter{}, fmt.Errorf("unknown %s formatter", key)
 	}
 }
